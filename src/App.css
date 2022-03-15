@@ -1,8 +1,9 @@
 @import url('http://fonts.cdnfonts.com/css/amazon-ember');
 .app-container{
-  padding: 5%;
+  padding: 5vh;
   font-family: 'Amazon Ember';
   background-color: #1F1D36;
   box-sizing: border-box;
-  color: beige;
+  color: #D8E9A8;
+  height: 100vh;
 }

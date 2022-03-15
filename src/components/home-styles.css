@@ -1,0 +1,32 @@
+
+.search-bar {
+    background:#e7edd5;
+    border-radius: 5px;
+    margin-top: 10px !important;
+    width: 50%;
+}
+
+.movie-grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    height: calc(90vh - 126px) !important;
+    overflow-y: scroll;
+}
+
+.movie-card {
+    margin-right: 15px;
+    width:200px;
+    color: #D8E9A8 !important;
+}
+
+@media only screen and (max-width: 768px) {
+    .search-bar {
+        width: 80%;
+    }
+    .movie-card {
+        margin-right: 10px;
+        width:140px;
+    }
+}
