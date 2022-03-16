@@ -140,7 +140,7 @@ function Home() {
                                 setSelectedMovie(movie);
                             }}>
                             { movie.isFavorite ? <StarIcon className='star-icon'/> : <StarBorderIcon className='star-icon'/>}
-                            <img width='100%' className='poster' src={movie.poster}
+                            <img alt ='' width='100%' className='poster' src={movie.poster}
                                 onError= {(e)=>{
                                     e.target.src = "image-not-found.png" 
                                 }
