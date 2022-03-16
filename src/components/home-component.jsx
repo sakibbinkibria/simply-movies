@@ -35,13 +35,13 @@ function Home() {
     async function fetchMovies(searchParam, list) {
         if (searchParam) {
             let first10Movies = [];
-            let res1 = await axios.get("http://www.omdbapi.com/?apikey=aef3137f&s=" + searchParam + "&page=" + currentPage);
+            let res1 = await axios.get("https://www.omdbapi.com/?apikey=aef3137f&s=" + searchParam + "&page=" + currentPage);
             if(!res1 || !res1.data || !res1.data.Search || res1.data.Search.length === 0){
                 setLoading(false);
                 return;
             }
             for(let movie of res1.data.Search){
-                const fullMovie = await axios.get("http://www.omdbapi.com/?apikey=aef3137f&i=" + movie.imdbID);
+                const fullMovie = await axios.get("https://www.omdbapi.com/?apikey=aef3137f&i=" + movie.imdbID);
                 first10Movies.push({
                     id: movie.imdbID,
                     title: fullMovie.data.Title,
@@ -65,13 +65,13 @@ function Home() {
                 setMovieList(first10Movies);
             }
             let second10Movies = [];
-            let res2 = await axios.get("http://www.omdbapi.com/?apikey=aef3137f&s=" + searchParam + "&page="+(currentPage+1));
+            let res2 = await axios.get("https://www.omdbapi.com/?apikey=aef3137f&s=" + searchParam + "&page="+(currentPage+1));
             if(!res2 || !res2.data || !res2.data.Search || res2.data.Search.length === 0){
                 setLoading(false);
                 return;
             }
             for(let movie of res2.data.Search){
-                const fullMovie = await axios.get("http://www.omdbapi.com/?apikey=aef3137f&i=" + movie.imdbID);
+                const fullMovie = await axios.get("https://www.omdbapi.com/?apikey=aef3137f&i=" + movie.imdbID);
                 second10Movies.push({
                     id: movie.imdbID,
                     title: fullMovie.data.Title,
