@@ -1,9 +1,30 @@
 @import url('http://fonts.cdnfonts.com/css/amazon-ember');
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #d7dbcc; 
+}
+::-webkit-scrollbar-thumb {
+  background: #5a6159; 
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+
+
 .app-container{
   padding: 5vh;
   font-family: 'Amazon Ember';
-  background-color: #1F1D36;
+  background-color: #261e2c;
   box-sizing: border-box;
-  color: #D8E9A8;
+  color: rgb(207, 207, 184);
   height: 100vh;
+}
+
+@media only screen and (max-width: 450px) {
+  .app-container{
+    padding: 2vh;
+  }
 }

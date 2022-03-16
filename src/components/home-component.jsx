@@ -2,18 +2,35 @@ import { Box, Tab, OutlinedInput, LinearProgress, Button, IconButton, InputAdorn
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { useState, useEffect, useRef } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import StarIcon from '@mui/icons-material/Star';
 import axios from 'axios';
+
+import DataStore from '../data-store';
+import Sidebar from './sidebar-component';
 
 import './home-styles.css'
 
 function Home() {
-    const [activeTabIndex, setActiveTabIndex] = useState('1');
-    const [searchParam, setSearchParam] = useState();
+    const [activeTabIndex, setActiveTabIndex] = useState("1");
+    const [searchParam, setSearchParam] = useState("Great");
     const [movieList, setMovieList] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [moreToSearch, setMoreToSearch] = useState(true);
+    const [moreToLoad, setMoreToLoad] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [openSidebar, setOpenSidebar] = useState(false);
+    const [selectedMovie, setSelectedMovie] = useState();
     const gridRef = useRef();
+    const dataStore = new DataStore();
+
+    useEffect(() => {
+        setLoading(true);
+        fetchMovies('Great', []);
+    }, []);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchParam]);
 
     async function fetchMovies(searchParam, list) {
         if (searchParam) {
@@ -26,9 +43,16 @@ function Home() {
             for(let movie of res1.data.Search){
                 const fullMovie = await axios.get("http://www.omdbapi.com/?apikey=aef3137f&i=" + movie.imdbID);
                 first10Movies.push({
+                    id: movie.imdbID,
                     title: fullMovie.data.Title,
                     poster: fullMovie.data.Poster,
                     rating: fullMovie.data.imdbRating,
+                    plot: fullMovie.data.Plot,
+                    duration: fullMovie.data.Runtime,
+                    genre: fullMovie.data.Genre,
+                    releaseDate: fullMovie.data.Released,
+                    cast: fullMovie.data.Actors,
+                    isFavorite:  dataStore.favorites && dataStore.favorites.includes(movie.imdbID) ? true : false,
                 })
             }
             
@@ -49,9 +73,16 @@ function Home() {
             for(let movie of res2.data.Search){
                 const fullMovie = await axios.get("http://www.omdbapi.com/?apikey=aef3137f&i=" + movie.imdbID);
                 second10Movies.push({
+                    id: movie.imdbID,
                     title: fullMovie.data.Title,
                     poster: fullMovie.data.Poster,
                     rating: fullMovie.data.imdbRating,
+                    plot: fullMovie.data.Plot,
+                    duration: fullMovie.data.Runtime,
+                    genre: fullMovie.data.Genre,
+                    releaseDate: fullMovie.data.Released,
+                    cast: fullMovie.data.Actors,
+                    isFavorite:  dataStore.favorites && dataStore.favorites.includes(movie.imdbID) ? true : false,
                 })
             }
             
@@ -60,7 +91,7 @@ function Home() {
                 setMovieList( movies);
                 setCurrentPage(currentPage+2);
                 if(second10Movies.length < 10){
-                    setMoreToSearch(false);
+                    setMoreToLoad(false);
                 }
             }
             setLoading(false);
@@ -70,16 +101,6 @@ function Home() {
         }
     }
 
-    useEffect(() => {
-        setLoading(true);
-        setSearchParam('avengers');
-        fetchMovies('avengers', []);
-    }, []);
-
-    useEffect(() => {
-        setMovieList([]);
-        setCurrentPage(1);
-    }, [searchParam]);
 
     const handleChange = (event, newValue) => {
         setActiveTabIndex(newValue);
@@ -90,27 +111,46 @@ function Home() {
           const { scrollTop, scrollHeight, clientHeight } = gridRef.current;
           if (scrollHeight - scrollTop - clientHeight < 3 && !loading) {
             setLoading(true);
-            fetchMovies(searchParam, movieList);
+            if(moreToLoad){
+                fetchMovies(searchParam, movieList); 
+            } else {
+                setLoading(false);
+            }
           }
         }
       };
 
     const movieGrid = (list) => {
+        let text = '';
         if(activeTabIndex === "2"){
             list.sort((a,b)=>
                 b.rating - a.rating
             )
+        } else if(activeTabIndex === "3"){
+            list = list.filter(movie => movie.isFavorite);
+            text = "Nothing Added to Favorites";
         }
         return (
             <div className='movie-grid' ref={gridRef} onScroll={onScroll}>
-                {list && list.length > 0 && list.map((movie, index) => {
+                {list && list.length > 0 ? list.map((movie, index) => {
                     return (
-                        <div className='movie-card' key={index}>
-                            <img width='100%' src={movie.poster} alt='No Poster' />
-                            <p>{movie.title}</p>
+                        <div className='movie-card' key={index}
+                            onClick={()=>{
+                                setOpenSidebar(true);
+                                setSelectedMovie(movie);
+                            }}>
+                            { movie.isFavorite ? <StarIcon className='star-icon'/> : <StarBorderIcon className='star-icon'/>}
+                            <img width='100%' className='poster' src={movie.poster}
+                                onError= {(e)=>{
+                                    e.target.src = "image-not-found.png" 
+                                }
+                                } />
+                            <p style={{textAlign:"center"}}>{movie.title}</p>
                         </div>
                     )
-                })}
+                })
+                : <h4>{text}</h4>
+            }
             </div>
         )
     }
@@ -122,12 +162,13 @@ function Home() {
 
     return (
         <div>
+            {openSidebar && <Sidebar movie = {selectedMovie} open={openSidebar} setOpen={setOpenSidebar}/>}
             <TabContext value={activeTabIndex}>
-                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Box sx={{ borderBottom: 1, borderColor: "#949085" }}>
                     <TabList onChange={handleChange}>
-                        <Tab label={<span style={{ color: activeTabIndex === "1" ? '#D8E9A8' : '#4E9F3D'}}>All</span>} value="1" />
-                        <Tab label={<span style={{ color: activeTabIndex === "2" ? '#D8E9A8' : '#4E9F3D'}}>Trending</span>} value="2" />
-                        <Tab label={<span style={{ color: activeTabIndex === "3" ? '#D8E9A8' : '#4E9F3D'}}>Favorites</span>} value="3" />
+                        <Tab className='tab-header' label={<span style={{ color: activeTabIndex === "1" ? '#1ce3d6' : '#81ce31'}}>All</span>} value="1" />
+                        <Tab className='tab-header' label={<span style={{ color: activeTabIndex === "2" ? '#1ce3d6' : '#81ce31'}}>Trending</span>} value="2" />
+                        <Tab className='tab-header' label={<span style={{ color: activeTabIndex === "3" ? '#1ce3d6' : '#81ce31'}}>Favorites</span>} value="3" />
                     </TabList>
                 </Box>
                 <div style={{display:'flex', justifyContent:"center", alignItems:"center", flexDirection:'row'}}>
@@ -154,14 +195,16 @@ function Home() {
                     />
 
                 </div>
-                {loading && <LinearProgress style={{margin:'5px'}}/>}
+                {loading && <LinearProgress/>}
                 <TabPanel value="1">
                     {movieGrid([...movieList])}
                 </TabPanel>
                 <TabPanel value="2">
                     {movieGrid([...movieList])}
                 </TabPanel>
-                <TabPanel value="3">Item Three</TabPanel>
+                <TabPanel value="3">
+                    {movieGrid([...movieList])}
+                </TabPanel>
             </TabContext>
         </div>
     );
