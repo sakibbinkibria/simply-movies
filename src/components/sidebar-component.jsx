@@ -50,7 +50,7 @@ function Sidebar({ movie, open, setOpen }) {
                         { isFavorite ? <StarIcon className='star-icon-sidebar'/> : <StarBorderIcon className='star-icon-sidebar'/>}
                     </IconButton>
                 </Tooltip>  
-                <img src={movie.poster} className= 'sidebar-poster' />
+                <img alt ='' src={movie.poster} className= 'sidebar-poster' />
                 <p className='sidebar-title'>{movie.title}</p>
                 <div className='details'>
                     <div><strong>Plot Summary: </strong> <p>{movie.plot}</p></div>
